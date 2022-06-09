@@ -1,0 +1,25 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
+    "prettier"
+  ],
+  "rules": {
+    "comma-dangle": ["error", "always-multiline"],
+    "max-len": [
+        "error",
+        {
+            "code": 90,
+            "tabWidth": 2,
+            "ignoreUrls": true
+        }
+    ]
+  }
+}
