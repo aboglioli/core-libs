@@ -1,0 +1,30 @@
+name: Typescript
+
+on:
+  push:
+    tags:
+      - typescript/v**
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Setup
+      run: npm ci
+
+    - name: Tests
+      run: npm run test
+
+    - name: Build
+      run: npm run buil
+
+    - name: Publish
+      run: npm publish --access public
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

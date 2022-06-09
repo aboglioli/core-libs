@@ -1,0 +1,25 @@
+name: Rust
+
+on:
+  push:
+    tags:
+      - rust/v**
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions-rs/toolchain@v1
+      with:
+          toolchain: stable
+          override: true
+
+    - name: Tests
+      run: cargo test
+
+    - name: Publish
+      run: cargo publish --token ${CRATES_TOKEN}
+      env:
+        CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
