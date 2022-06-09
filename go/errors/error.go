@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/aboglioli/libs/go/collections"
+	"github.com/aboglioli/core-libs/go/collections"
 )
 
 // ErrorCode

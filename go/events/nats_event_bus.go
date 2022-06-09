@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/aboglioli/libs/go/collections"
-	"github.com/aboglioli/libs/go/errors"
+	"github.com/aboglioli/core-libs/go/collections"
+	"github.com/aboglioli/core-libs/go/errors"
 	"github.com/nats-io/nats.go"
 )
 

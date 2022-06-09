@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aboglioli/libs/go/types"
+	"github.com/aboglioli/core-libs/go/types"
 	"github.com/stretchr/testify/assert"
 )
 

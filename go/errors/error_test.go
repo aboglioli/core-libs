@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/aboglioli/libs/go/collections"
+	"github.com/aboglioli/core-libs/go/collections"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/aboglioli/libs/go/collections"
-	"github.com/aboglioli/libs/go/errors"
+	"github.com/aboglioli/core-libs/go/collections"
+	"github.com/aboglioli/core-libs/go/errors"
 )
 
 var (

@@ -3,7 +3,7 @@ package cache
 import (
 	"context"
 
-	"github.com/aboglioli/libs/go/errors"
+	"github.com/aboglioli/core-libs/go/errors"
 )
 
 var (

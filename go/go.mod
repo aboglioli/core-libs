@@ -1,4 +1,4 @@
-module github.com/aboglioli/libs/go
+module github.com/aboglioli/core-libs/go
 
 go 1.18
 
