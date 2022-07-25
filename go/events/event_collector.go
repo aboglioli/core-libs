@@ -1,7 +1,7 @@
 package events
 
 type Publishable interface {
-	Id() string
+	EntityId() string
 	Topic() string
 }
 
@@ -20,7 +20,7 @@ func CreateEventCollector() *EventCollector {
 }
 
 func (c *EventCollector) Record(p Publishable) error {
-	event, err := CreateEvent(p.Id(), p.Topic(), p)
+	event, err := CreateEvent(p.EntityId(), p.Topic(), p)
 	if err != nil {
 		return err
 	}
