@@ -1,7 +1,7 @@
 import { Event } from './event';
 
 export interface Publishable {
-  id(): string;
+  entityId(): string;
   topic(): string;
 }
 
@@ -17,7 +17,7 @@ export class EventCollector {
   }
 
   record(p: Publishable) {
-    const event = Event.create(p.id(), p.topic(), p);
+    const event = Event.create(p.entityId(), p.topic(), p);
 
     this.events.push(event);
   }
