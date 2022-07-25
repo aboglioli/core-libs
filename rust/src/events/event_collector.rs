@@ -5,7 +5,7 @@ use crate::errors::Result;
 use crate::events::Event;
 
 pub trait Publishable: Serialize {
-    fn id(&self) -> &str;
+    fn entity_id(&self) -> &str;
     fn topic(&self) -> &str;
 }
 
@@ -27,7 +27,7 @@ impl EventCollector {
     where
         P: Publishable,
     {
-        let event = Event::create(p.id(), p.topic(), &p)?;
+        let event = Event::create(p.entity_id(), p.topic(), &p)?;
 
         self.events.push(event);
 
@@ -53,7 +53,7 @@ mod tests {
     }
 
     impl Publishable for SomethingHappened {
-        fn id(&self) -> &str {
+        fn entity_id(&self) -> &str {
             "something-happened#01"
         }
 
