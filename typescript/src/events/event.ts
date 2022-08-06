@@ -1,9 +1,11 @@
 import { v4 as uuid } from 'uuid';
 import { Buffer } from 'buffer';
 
-export const ErrInvalidEvent = new Error('invalid event');
-export const ErrPayloadSerialization = new Error('event.payload_serialization');
-export const ErrInternal = new Error('internal event');
+import {
+  ErrInvalidEvent,
+  ErrSerializingPayload,
+  ErrDeserializingPayload,
+} from './errors';
 
 // Event
 export class Event {
@@ -49,7 +51,7 @@ export class Event {
       const json = JSON.stringify(payload);
       buff = Buffer.from(json);
     } catch (err) {
-      throw ErrPayloadSerialization;
+      throw ErrSerializingPayload;
     }
 
     return new Event(uuid(), entityId, topic, new Uint8Array(buff), new Date());
@@ -77,7 +79,7 @@ export class Event {
     try {
       return JSON.parse(buff.toString());
     } catch (err) {
-      throw ErrPayloadSerialization;
+      throw ErrDeserializingPayload;
     }
   }
 
