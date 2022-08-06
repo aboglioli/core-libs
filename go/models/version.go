@@ -1,12 +1,11 @@
 package models
 
 import (
-	"github.com/aboglioli/core-libs/go/collections"
-	"github.com/aboglioli/core-libs/go/errors"
+	"errors"
 )
 
 var (
-	ErrInvalidVersion = errors.Define("version.invalid")
+	ErrInvalidVersion = errors.New("invalid version")
 )
 
 type Version struct {
@@ -17,11 +16,7 @@ type Version struct {
 
 func NewVersion(version int64) (Version, error) {
 	if version < 1 {
-		return Version{}, errors.New(
-			ErrInvalidVersion,
-			"version is smaller than 1",
-			collections.WithMetadata("version", version),
-		)
+		return Version{}, ErrInvalidVersion
 	}
 
 	return Version{

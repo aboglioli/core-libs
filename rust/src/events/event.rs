@@ -1,42 +1,16 @@
-use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::borrow::Cow;
+use thiserror::Error;
 use uuid::Uuid;
 
-use crate::collections::Metadata;
-use crate::errors::{Define, Error, Result};
-
+#[derive(Error, Debug)]
 pub enum EventError {
+    #[error("invalid event")]
     Invalid,
+    #[error("payload serialization")]
     PayloadSerialization,
+    #[error("internal event error")]
     Internal,
-}
-
-impl Define for EventError {
-    fn define(&self) -> &str {
-        match self {
-            EventError::Invalid => "event.invalid",
-            EventError::PayloadSerialization => "event.payload_serialization",
-            EventError::Internal => "event.internal",
-        }
-    }
-}
-
-// Publisher and subscriber
-#[async_trait]
-pub trait Publisher {
-    async fn publish(&self, events: &[Event]) -> Result<()>;
-}
-
-#[async_trait]
-pub trait Handler: Sync + Send {
-    async fn handle(&self, event: &Event) -> Result<()>;
-}
-
-#[async_trait]
-pub trait Subscriber {
-    async fn subscribe(&self, subject: Cow<'_, str>, handler: Box<dyn Handler>) -> Result<()>;
 }
 
 // Event
@@ -56,42 +30,21 @@ impl Event {
         topic: String,
         payload: Vec<u8>,
         timestamp: DateTime<Utc>,
-    ) -> Result<Event> {
-        let metadata = Metadata::with("id", &id)
-            .and("entity_id", &entity_id)
-            .and("topic", &topic)
-            .and("payload", &payload);
-
+    ) -> Result<Event, EventError> {
         if id.is_empty() {
-            return Err(Error::new(
-                EventError::Invalid,
-                "event id is empty",
-                metadata,
-            ));
+            return Err(EventError::Invalid);
         }
 
         if entity_id.is_empty() {
-            return Err(Error::new(
-                EventError::Invalid,
-                "event entity_id is empty",
-                metadata,
-            ));
+            return Err(EventError::Invalid);
         }
 
         if topic.is_empty() {
-            return Err(Error::new(
-                EventError::Invalid,
-                "event topic is empty",
-                metadata,
-            ));
+            return Err(EventError::Invalid);
         }
 
         if payload.is_empty() {
-            return Err(Error::new(
-                EventError::Invalid,
-                "cannot marshal event payload",
-                metadata,
-            ));
+            return Err(EventError::Invalid);
         }
 
         Ok(Event {
@@ -103,7 +56,7 @@ impl Event {
         })
     }
 
-    pub fn create<I, T, P>(entity_id: I, topic: T, payload: &P) -> Result<Event>
+    pub fn create<I, T, P>(entity_id: I, topic: T, payload: &P) -> Result<Event, EventError>
     where
         I: Into<String>,
         T: Into<String>,
@@ -112,16 +65,7 @@ impl Event {
         let entity_id = entity_id.into();
         let topic = topic.into();
 
-        let payload = serde_json::to_vec(payload).map_err(|err| {
-            Error::wrap_raw(
-                EventError::PayloadSerialization,
-                &err,
-                "could not serialize event payload",
-                Metadata::with("entity_id", &entity_id)
-                    .and("topic", &topic)
-                    .and("payload", payload),
-            )
-        })?;
+        let payload = serde_json::to_vec(payload).map_err(|_| EventError::PayloadSerialization)?;
 
         Event::new(
             Uuid::new_v4().to_string(),
@@ -148,21 +92,11 @@ impl Event {
         &self.payload
     }
 
-    pub fn deserialize_payload<'a, T>(&'a self) -> Result<T>
+    pub fn deserialize_payload<'a, T>(&'a self) -> Result<T, EventError>
     where
         T: Deserialize<'a>,
     {
-        serde_json::from_slice(&self.payload).map_err(|err| {
-            Error::wrap_raw(
-                EventError::PayloadSerialization,
-                &err,
-                "could not deserialize event payload",
-                Metadata::with("id", &self.id)
-                    .and("entity_id", &self.entity_id)
-                    .and("topic", &self.topic)
-                    .and("payload", &self.payload),
-            )
-        })
+        serde_json::from_slice(&self.payload).map_err(|_| EventError::PayloadSerialization)
     }
 
     pub fn timestamp(&self) -> &DateTime<Utc> {

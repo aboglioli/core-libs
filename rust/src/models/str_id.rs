@@ -1,18 +1,10 @@
+use thiserror::Error;
 use uuid::Uuid;
 
-use crate::collections::Metadata;
-use crate::errors::{Define, Error, Result};
-
+#[derive(Error, Debug)]
 pub enum IdError {
+    #[error("invalid id")]
     Invalid,
-}
-
-impl Define for IdError {
-    fn define(&self) -> &str {
-        match self {
-            IdError::Invalid => "id.invalid",
-        }
-    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -21,26 +13,22 @@ pub struct StrId {
 }
 
 impl StrId {
-    pub fn new<S: Into<String>>(id: S) -> Result<StrId> {
+    pub fn new<S: Into<String>>(id: S) -> Result<StrId, IdError> {
         let id = id.into();
 
         if id.is_empty() {
-            return Err(Error::new(
-                IdError::Invalid,
-                "empty string id",
-                Metadata::with("id", id),
-            ));
+            return Err(IdError::Invalid);
         }
 
         Ok(StrId { id })
     }
 
-    pub fn generate_uuid() -> Result<StrId> {
+    pub fn generate_uuid() -> Result<StrId, IdError> {
         let uuid = Uuid::new_v4();
         StrId::new(uuid.to_string())
     }
 
-    pub fn generate_slug<S: Into<String>>(str: S) -> Result<StrId> {
+    pub fn generate_slug<S: Into<String>>(str: S) -> Result<StrId, IdError> {
         StrId::new(slug::slugify(str.into()))
     }
 

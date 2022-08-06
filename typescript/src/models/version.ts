@@ -1,7 +1,4 @@
-import { Error } from '../errors';
-import { Metadata } from '../collections';
-
-export const ErrInvalidVersion = Error.define('version.invalid');
+export const ErrInvalidVersion = new Error('invalid version');
 
 export class Version {
   private version: number;
@@ -9,11 +6,7 @@ export class Version {
 
   constructor(version: number) {
     if (version < 1) {
-      throw Error.create(
-        ErrInvalidVersion,
-        'version is smaller than 1',
-        Metadata.with('version', version),
-      );
+      throw ErrInvalidVersion;
     }
 
     this.version = version;

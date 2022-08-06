@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aboglioli/core-libs/go/types"
+	"github.com/aboglioli/core-libs/go/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,27 +28,27 @@ func TestTimestamps(t *testing.T) {
 		tests := []test{
 			{
 				name:      "valid",
-				createdAt: types.Unwrap(time.Parse(time.RFC3339, "2022-04-04T15:30:00Z")),
-				updatedAt: types.Unwrap(time.Parse(time.RFC3339, "2022-04-04T15:30:00Z")),
+				createdAt: utils.Unwrap(time.Parse(time.RFC3339, "2022-04-04T15:30:00Z")),
+				updatedAt: utils.Unwrap(time.Parse(time.RFC3339, "2022-04-04T15:30:00Z")),
 			},
 			{
 				name:        "updated_at before created_at",
-				createdAt:   types.Unwrap(time.Parse(time.RFC3339, "2022-04-04T15:30:00Z")),
-				updatedAt:   types.Unwrap(time.Parse(time.RFC3339, "2022-04-04T15:29:00Z")),
+				createdAt:   utils.Unwrap(time.Parse(time.RFC3339, "2022-04-04T15:30:00Z")),
+				updatedAt:   utils.Unwrap(time.Parse(time.RFC3339, "2022-04-04T15:29:00Z")),
 				expectedErr: true,
 			},
 			{
 				name:        "deleted_at before created_at",
-				createdAt:   types.Unwrap(time.Parse(time.RFC3339, "2022-04-04T15:30:00Z")),
-				updatedAt:   types.Unwrap(time.Parse(time.RFC3339, "2022-04-04T16:15:00Z")),
-				deletedAt:   types.Ref(types.Unwrap(time.Parse(time.RFC3339, "2022-04-04T14:45:00Z"))),
+				createdAt:   utils.Unwrap(time.Parse(time.RFC3339, "2022-04-04T15:30:00Z")),
+				updatedAt:   utils.Unwrap(time.Parse(time.RFC3339, "2022-04-04T16:15:00Z")),
+				deletedAt:   utils.Ref(utils.Unwrap(time.Parse(time.RFC3339, "2022-04-04T14:45:00Z"))),
 				expectedErr: true,
 			},
 			{
 				name:        "deleted_at before updated_at",
-				createdAt:   types.Unwrap(time.Parse(time.RFC3339, "2022-04-04T15:30:00Z")),
-				updatedAt:   types.Unwrap(time.Parse(time.RFC3339, "2022-04-04T16:15:00Z")),
-				deletedAt:   types.Ref(types.Unwrap(time.Parse(time.RFC3339, "2022-04-04T16:14:59Z"))),
+				createdAt:   utils.Unwrap(time.Parse(time.RFC3339, "2022-04-04T15:30:00Z")),
+				updatedAt:   utils.Unwrap(time.Parse(time.RFC3339, "2022-04-04T16:15:00Z")),
+				deletedAt:   utils.Ref(utils.Unwrap(time.Parse(time.RFC3339, "2022-04-04T16:14:59Z"))),
 				expectedErr: true,
 			},
 		}

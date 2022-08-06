@@ -1,7 +1,4 @@
-import { Error } from '../errors';
-import { Metadata } from '../collections';
-
-export const ErrInvalidTimestamps = Error.define('timestamps.invalid');
+export const ErrInvalidTimestamps = new Error('invalid timestamps');
 
 export class Timestamps {
   private createdAt: Date;
@@ -9,21 +6,17 @@ export class Timestamps {
   private deletedAt?: Date;
 
   constructor(createdAt: Date, updatedAt: Date, deletedAt?: Date) {
-    const m = Metadata.with('created_at', createdAt)
-      .and('updated_at', updatedAt)
-      .and('deleted_at', deletedAt);
-
     if (updatedAt < createdAt) {
-      throw Error.create(ErrInvalidTimestamps, 'update date is before create date', m);
+      throw ErrInvalidTimestamps;
     }
 
     if (deletedAt) {
       if (deletedAt < createdAt) {
-        throw Error.create(ErrInvalidTimestamps, 'delete date is before create date', m);
+        throw ErrInvalidTimestamps;
       }
 
       if (deletedAt < updatedAt) {
-        throw Error.create(ErrInvalidTimestamps, 'delete date is before update date', m);
+        throw ErrInvalidTimestamps;
       }
     }
 

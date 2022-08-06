@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/aboglioli/core-libs/go/collections"
-	"github.com/aboglioli/core-libs/go/errors"
 	"github.com/nats-io/nats.go"
 )
 
@@ -14,11 +12,11 @@ var _ Publisher = (*NatsEventBus)(nil)
 var _ Subscriber = (*NatsEventBus)(nil)
 
 type NatsEvent struct {
-	Id        string    `json:"id"`
-	EntityId  string    `json:"entity_id"`
-	Topic     string    `json:"topic"`
-	Payload   []byte    `json:"payload"`
-	Timestamp time.Time `json:"timestamp"`
+	Id        string      `json:"id"`
+	EntityId  string      `json:"entity_id"`
+	Topic     string      `json:"topic"`
+	Payload   interface{} `json:"payload"`
+	Timestamp time.Time   `json:"timestamp"`
 }
 
 type NatsEventBus struct {
@@ -48,21 +46,11 @@ func (eb *NatsEventBus) Publish(ctx context.Context, events ...*Event) error {
 
 		msg, err := json.Marshal(&natsEvent)
 		if err != nil {
-			return errors.Wrap(
-				ErrEventInternal,
-				err,
-				"could not marshal message",
-				collections.WithMetadata("message", natsEvent),
-			)
+			return ErrPublishingEvent
 		}
 
 		if err := eb.conn.Publish(event.Topic(), msg); err != nil {
-			return errors.Wrap(
-				ErrEventInternal,
-				err,
-				"could not publish message",
-				collections.WithMetadata("message", natsEvent),
-			)
+			return ErrPublishingEvent
 		}
 	}
 
@@ -89,12 +77,7 @@ func (eb *NatsEventBus) Subscribe(ctx context.Context, subject string, handler H
 		handler.Handle(ctx, event)
 	})
 	if err != nil {
-		return errors.Wrap(
-			ErrEventInternal,
-			err,
-			"could not subscribe to subject",
-			collections.WithMetadata("subject", subject),
-		)
+		return ErrPublishingEvent
 	}
 
 	return nil

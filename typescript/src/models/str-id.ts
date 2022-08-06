@@ -1,17 +1,14 @@
 import slug from 'slug';
 import { v4 as uuid } from 'uuid';
 
-import { Error } from '../errors';
-import { Metadata } from '../collections';
-
-export const ErrInvalidId = Error.define('id.invalid');
+export const ErrInvalidId = new Error('invalid id');
 
 export class StrId {
   private id: string;
 
   constructor(id: string) {
     if (id.length == 0) {
-      throw Error.create(ErrInvalidId, 'empty string id', Metadata.with('id', id));
+      throw ErrInvalidId;
     }
 
     this.id = id;

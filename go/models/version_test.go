@@ -3,7 +3,7 @@ package models
 import (
 	"testing"
 
-	"github.com/aboglioli/core-libs/go/types"
+	"github.com/aboglioli/core-libs/go/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,7 +19,7 @@ func TestVersion(t *testing.T) {
 	})
 
 	t.Run("existing version", func(t *testing.T) {
-		assert.Error(t, types.UnwrapError(NewVersion(0)))
+		assert.Error(t, utils.UnwrapError(NewVersion(0)))
 
 		v1, err := NewVersion(3)
 		assert.NoError(t, err)

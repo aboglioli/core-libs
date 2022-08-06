@@ -1,8 +1,7 @@
 use serde::Serialize;
 use std::mem;
 
-use crate::errors::Result;
-use crate::events::Event;
+use crate::events::{Event, EventError};
 
 pub trait Publishable: Serialize {
     fn entity_id(&self) -> &str;
@@ -10,20 +9,20 @@ pub trait Publishable: Serialize {
 }
 
 #[derive(Debug, Clone)]
-pub struct EventCollector {
+pub struct Collector {
     events: Vec<Event>,
 }
 
-impl EventCollector {
-    pub fn new(events: Vec<Event>) -> EventCollector {
-        EventCollector { events }
+impl Collector {
+    pub fn new(events: Vec<Event>) -> Collector {
+        Collector { events }
     }
 
-    pub fn create() -> EventCollector {
-        EventCollector::new(Vec::new())
+    pub fn create() -> Collector {
+        Collector::new(Vec::new())
     }
 
-    pub fn record<P>(&mut self, p: P) -> Result<()>
+    pub fn record<P>(&mut self, p: P) -> Result<(), EventError>
     where
         P: Publishable,
     {
@@ -64,7 +63,7 @@ mod tests {
 
     #[test]
     fn get_all_events() {
-        let mut collector = EventCollector::create();
+        let mut collector = Collector::create();
 
         collector
             .record(SomethingHappened {

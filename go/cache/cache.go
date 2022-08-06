@@ -2,12 +2,11 @@ package cache
 
 import (
 	"context"
-
-	"github.com/aboglioli/core-libs/go/errors"
+	"errors"
 )
 
 var (
-	ErrCacheInternal = errors.Define("cache.internal")
+	ErrCacheInternal = errors.New("internal cache error")
 )
 
 type Cache[K any, V any] interface {

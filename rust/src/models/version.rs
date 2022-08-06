@@ -1,16 +1,9 @@
-use crate::collections::Metadata;
-use crate::errors::{Define, Error, Result};
+use thiserror::Error;
 
+#[derive(Error, Debug)]
 pub enum VersionError {
+    #[error("invalid version")]
     Invalid,
-}
-
-impl Define for VersionError {
-    fn define(&self) -> &str {
-        match self {
-            VersionError::Invalid => "version.invalid",
-        }
-    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -20,13 +13,9 @@ pub struct Version {
 }
 
 impl Version {
-    pub fn new(version: i64) -> Result<Version> {
+    pub fn new(version: i64) -> Result<Version, VersionError> {
         if version < 1 {
-            return Err(Error::new(
-                VersionError::Invalid,
-                "version is smaller than 1",
-                Metadata::with("version", version),
-            ));
+            return Err(VersionError::Invalid);
         }
 
         Ok(Version {

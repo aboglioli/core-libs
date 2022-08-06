@@ -35,7 +35,7 @@ export class LocalEventBus implements Publisher, Subscriber {
     for (const event of events) {
       for (const subscription of this.subscriptions) {
         if (subjectHasTopic(subscription.subject, event.getTopic())) {
-          await subscription.handler.handle(event);
+          subscription.handler.handle(event);
         }
       }
     }

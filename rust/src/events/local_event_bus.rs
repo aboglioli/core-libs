@@ -1,10 +1,8 @@
 use async_trait::async_trait;
-use std::borrow::Cow;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
-use crate::errors::Result;
-use crate::events::{Event, Handler, Publisher, Subscriber};
+use crate::events::{Event, EventError, Handler, Publisher, Subscriber};
 
 struct Subscription {
     subject: String,
@@ -45,7 +43,7 @@ fn subject_has_topic(subject: &str, topic: &str) -> bool {
 
 #[async_trait]
 impl Publisher for LocalEventBus {
-    async fn publish(&self, events: &[Event]) -> Result<()> {
+    async fn publish(&self, events: &[Event]) -> Result<(), EventError> {
         let subscriptions = self.subscriptions.read().await;
 
         for event in events {
@@ -62,11 +60,11 @@ impl Publisher for LocalEventBus {
 
 #[async_trait]
 impl Subscriber for LocalEventBus {
-    async fn subscribe(&self, subject: Cow<'_, str>, handler: Box<dyn Handler>) -> Result<()> {
+    async fn subscribe(&self, subject: &str, handler: Box<dyn Handler>) -> Result<(), EventError> {
         let mut subscriptions = self.subscriptions.write().await;
 
         subscriptions.push(Subscription {
-            subject: subject.into_owned(),
+            subject: subject.to_string(),
             handler,
         });
 
@@ -96,7 +94,7 @@ mod tests {
 
     #[async_trait]
     impl Handler for Counter {
-        async fn handle(&self, event: &Event) -> Result<()> {
+        async fn handle(&self, event: &Event) -> Result<(), EventError> {
             let incr: i64 = event.deserialize_payload().unwrap();
 
             let mut count = self.count.lock().await;
@@ -113,12 +111,12 @@ mod tests {
 
         // Subscriptions
         let res = event_bus
-            .subscribe("topic.*".into(), Box::new(counter.clone()))
+            .subscribe("topic.*", Box::new(counter.clone()))
             .await;
         assert!(!res.is_err());
 
         let res = event_bus
-            .subscribe("topic.*".into(), Box::new(counter.clone()))
+            .subscribe("topic.*", Box::new(counter.clone()))
             .await;
         assert!(!res.is_err());
 
@@ -145,7 +143,7 @@ mod tests {
         let event = Event::create("entity#01", "increment.code", &1).unwrap();
 
         event_bus
-            .subscribe("increment.*".into(), Box::new(counter.clone()))
+            .subscribe("increment.*", Box::new(counter.clone()))
             .await
             .unwrap();
 

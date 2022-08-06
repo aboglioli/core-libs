@@ -1,14 +1,12 @@
 package models
 
 import (
+	"errors"
 	"time"
-
-	"github.com/aboglioli/core-libs/go/collections"
-	"github.com/aboglioli/core-libs/go/errors"
 )
 
 var (
-	ErrInvalidTimestamps = errors.Define("timestamps.invalid")
+	ErrInvalidTimestamps = errors.New("invalid timestamps")
 )
 
 type Timestamps struct {
@@ -22,33 +20,17 @@ func NewTimestamps(
 	updatedAt time.Time,
 	deletedAt *time.Time,
 ) (Timestamps, error) {
-	m := collections.WithMetadata("created_at", createdAt).
-		And("updated_at", updatedAt).
-		And("deleted_at", deletedAt)
-
 	if updatedAt.Before(createdAt) {
-		return Timestamps{}, errors.New(
-			ErrInvalidTimestamps,
-			"update date is before create date",
-			m,
-		)
+		return Timestamps{}, ErrInvalidTimestamps
 	}
 
 	if deletedAt != nil {
 		if deletedAt.Before(createdAt) {
-			return Timestamps{}, errors.New(
-				ErrInvalidTimestamps,
-				"delete date is before create date",
-				m,
-			)
+			return Timestamps{}, ErrInvalidTimestamps
 		}
 
 		if deletedAt.Before(updatedAt) {
-			return Timestamps{}, errors.New(
-				ErrInvalidTimestamps,
-				"delete date is before update date",
-				m,
-			)
+			return Timestamps{}, ErrInvalidTimestamps
 		}
 	}
 

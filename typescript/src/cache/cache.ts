@@ -1,6 +1,4 @@
-import { Error } from '../errors';
-
-export const ErrCacheInternal = Error.define('cache.internal');
+export const ErrCacheInternal = new Error('internal cache error');
 
 export interface Cache<K, V> {
   get(k: K): Promise<V | null>;

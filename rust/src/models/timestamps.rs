@@ -1,18 +1,10 @@
 use chrono::{DateTime, Utc};
+use thiserror::Error;
 
-use crate::collections::Metadata;
-use crate::errors::{Define, Error, Result};
-
+#[derive(Error, Debug)]
 pub enum TimestampsError {
+    #[error("invalid timestamps")]
     Invalid,
-}
-
-impl Define for TimestampsError {
-    fn define(&self) -> &str {
-        match self {
-            TimestampsError::Invalid => "timestamps.invalid",
-        }
-    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -27,34 +19,18 @@ impl Timestamps {
         created_at: DateTime<Utc>,
         updated_at: DateTime<Utc>,
         deleted_at: Option<DateTime<Utc>>,
-    ) -> Result<Timestamps> {
-        let metadata = Metadata::with("created_at", created_at)
-            .and("updated_at", updated_at)
-            .and("deleted_at", deleted_at);
-
+    ) -> Result<Timestamps, TimestampsError> {
         if updated_at < created_at {
-            return Err(Error::new(
-                TimestampsError::Invalid,
-                "update date is before create date",
-                metadata,
-            ));
+            return Err(TimestampsError::Invalid);
         }
 
         if let Some(deleted_at) = deleted_at {
             if deleted_at < created_at {
-                return Err(Error::new(
-                    TimestampsError::Invalid,
-                    "delete date is before create date",
-                    metadata,
-                ));
+                return Err(TimestampsError::Invalid);
             }
 
             if deleted_at < updated_at {
-                return Err(Error::new(
-                    TimestampsError::Invalid,
-                    "delete date is before update date",
-                    metadata,
-                ));
+                return Err(TimestampsError::Invalid);
             }
         }
 

@@ -1,25 +1,9 @@
 import { v4 as uuid } from 'uuid';
 import { Buffer } from 'buffer';
 
-import { Error } from '../errors';
-import { Metadata } from '../collections';
-
-export const ErrInvalidEvent = Error.define('event.invalid');
-export const ErrEventPayloadSerialization = Error.define('event.payload_serialization');
-export const ErrEventInternal = Error.define('event.internal');
-
-// Publisher and subscriber
-export interface Publisher {
-  publish(...events: Event[]): Promise<void>;
-}
-
-export interface Handler {
-  handle(event: Event): Promise<void>;
-}
-
-export interface Subscriber {
-  subscribe(subject: string, handler: Handler): Promise<void>;
-}
+export const ErrInvalidEvent = new Error('invalid event');
+export const ErrPayloadSerialization = new Error('event.payload_serialization');
+export const ErrInternal = new Error('internal event');
 
 // Event
 export class Event {
@@ -36,26 +20,20 @@ export class Event {
     payload: Uint8Array,
     timestamp: Date,
   ) {
-    const m = Metadata.with('id', id)
-      .and('entity_id', entityId)
-      .and('topic', topic)
-      .and('payload', payload)
-      .and('timestamp', timestamp);
-
     if (id.length === 0) {
-      throw Error.create(ErrInvalidEvent, 'payload id is empty', m);
+      throw ErrInvalidEvent;
     }
 
     if (entityId.length === 0) {
-      throw Error.create(ErrInvalidEvent, 'payload entity_id is empty', m);
+      throw ErrInvalidEvent;
     }
 
     if (topic.length === 0) {
-      throw Error.create(ErrInvalidEvent, 'payload topic is empty', m);
+      throw ErrInvalidEvent;
     }
 
     if (!payload || payload.length === 0) {
-      throw Error.create(ErrInvalidEvent, 'payload is empty', m);
+      throw ErrInvalidEvent;
     }
 
     this.id = id;
@@ -71,11 +49,7 @@ export class Event {
       const json = JSON.stringify(payload);
       buff = Buffer.from(json);
     } catch (err) {
-      throw Error.wrap(
-        ErrEventPayloadSerialization,
-        err,
-        'could not serialize event payload',
-      );
+      throw ErrPayloadSerialization;
     }
 
     return new Event(uuid(), entityId, topic, new Uint8Array(buff), new Date());
@@ -103,11 +77,7 @@ export class Event {
     try {
       return JSON.parse(buff.toString());
     } catch (err) {
-      throw Error.wrap(
-        ErrEventPayloadSerialization,
-        err,
-        'could not deserialize event payload',
-      );
+      throw ErrPayloadSerialization;
     }
   }
 

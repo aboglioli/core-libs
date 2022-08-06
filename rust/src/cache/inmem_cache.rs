@@ -6,8 +6,7 @@ use std::hash::Hash;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
-use crate::cache::Cache;
-use crate::errors::Result;
+use crate::cache::{Cache, CacheError};
 
 #[derive(Clone)]
 pub struct InMemCache<K, V> {
@@ -37,13 +36,13 @@ where
     K: Eq + Hash + Sync + Send + Serialize,
     V: Clone + Sync + Send,
 {
-    async fn get(&self, k: &K) -> Result<Option<V>> {
+    async fn get(&self, k: &K) -> Result<Option<V>, CacheError> {
         let items = self.items.read().await;
 
         Ok(items.get(k).cloned())
     }
 
-    async fn set(&self, k: K, v: V) -> Result<()> {
+    async fn set(&self, k: K, v: V) -> Result<(), CacheError> {
         let mut items = self.items.write().await;
 
         items.insert(k, v);
@@ -51,7 +50,7 @@ where
         Ok(())
     }
 
-    async fn delete(&self, k: &K) -> Result<()> {
+    async fn delete(&self, k: &K) -> Result<(), CacheError> {
         let mut items = self.items.write().await;
 
         items.remove(k);

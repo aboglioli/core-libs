@@ -1,22 +1,15 @@
 use async_trait::async_trait;
+use thiserror::Error;
 
-use crate::errors::{Define, Result};
-
+#[derive(Error, Debug)]
 pub enum CacheError {
+    #[error("internal cache error")]
     Internal,
-}
-
-impl Define for CacheError {
-    fn define(&self) -> &str {
-        match self {
-            CacheError::Internal => "cache.internal",
-        }
-    }
 }
 
 #[async_trait]
 pub trait Cache<K, V> {
-    async fn get(&self, k: &K) -> Result<Option<V>>;
-    async fn set(&self, k: K, v: V) -> Result<()>;
-    async fn delete(&self, k: &K) -> Result<()>;
+    async fn get(&self, k: &K) -> Result<Option<V>, CacheError>;
+    async fn set(&self, k: K, v: V) -> Result<(), CacheError>;
+    async fn delete(&self, k: &K) -> Result<(), CacheError>;
 }
