@@ -52,9 +52,11 @@ func (eb *LocalEventBus) Publish(ctx context.Context, events ...*Event) error {
 	for _, event := range events {
 		for _, subscription := range eb.subscriptions {
 			if subjectHasTopic(subscription.subject, event.Topic()) {
-				if err := subscription.handler.Handle(ctx, event); err != nil {
-					return err
-				}
+				go func() {
+					if err := subscription.handler.Handle(ctx, event); err != nil {
+						panic(err)
+					}
+				}()
 			}
 		}
 	}

@@ -1,14 +1,8 @@
 package models
 
 import (
-	"errors"
-
 	"github.com/google/uuid"
 	"github.com/gosimple/slug"
-)
-
-var (
-	ErrInvalidId = errors.New("invalid id")
 )
 
 type StrId struct {
@@ -17,7 +11,7 @@ type StrId struct {
 
 func NewStrId(id string) (StrId, error) {
 	if len(id) == 0 {
-		return StrId{}, ErrInvalidId
+		return StrId{}, &ErrInvalidId{id}
 	}
 
 	return StrId{

@@ -2,11 +2,6 @@ package cache
 
 import (
 	"context"
-	"errors"
-)
-
-var (
-	ErrCacheInternal = errors.New("internal cache error")
 )
 
 type Cache[K any, V any] interface {

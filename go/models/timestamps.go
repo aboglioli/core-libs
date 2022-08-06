@@ -1,12 +1,7 @@
 package models
 
 import (
-	"errors"
 	"time"
-)
-
-var (
-	ErrInvalidTimestamps = errors.New("invalid timestamps")
 )
 
 type Timestamps struct {

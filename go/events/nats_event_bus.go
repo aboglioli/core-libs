@@ -46,11 +46,11 @@ func (eb *NatsEventBus) Publish(ctx context.Context, events ...*Event) error {
 
 		msg, err := json.Marshal(&natsEvent)
 		if err != nil {
-			return ErrPublishingEvent
+			return &ErrSerializingEvent{event, err}
 		}
 
 		if err := eb.conn.Publish(event.Topic(), msg); err != nil {
-			return ErrPublishingEvent
+			return &ErrPublishingEvent{event, err}
 		}
 	}
 
@@ -77,7 +77,7 @@ func (eb *NatsEventBus) Subscribe(ctx context.Context, subject string, handler H
 		handler.Handle(ctx, event)
 	})
 	if err != nil {
-		return ErrPublishingEvent
+		return &ErrSubscribingToSubject{subject, err}
 	}
 
 	return nil

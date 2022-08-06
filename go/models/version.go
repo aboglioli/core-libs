@@ -1,13 +1,5 @@
 package models
 
-import (
-	"errors"
-)
-
-var (
-	ErrInvalidVersion = errors.New("invalid version")
-)
-
 type Version struct {
 	version int64
 
@@ -16,7 +8,7 @@ type Version struct {
 
 func NewVersion(version int64) (Version, error) {
 	if version < 1 {
-		return Version{}, ErrInvalidVersion
+		return Version{}, &ErrInvalidVersion{version}
 	}
 
 	return Version{

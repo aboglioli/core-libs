@@ -2,17 +2,10 @@ package events
 
 import (
 	"encoding/json"
-	"errors"
 	"reflect"
 	"time"
 
 	"github.com/google/uuid"
-)
-
-var (
-	ErrInvalidEvent    = errors.New("invalid event")
-	ErrUnknownPayload  = errors.New("unknown event payload")
-	ErrPublishingEvent = errors.New("could not publish event")
 )
 
 type Event struct {
@@ -94,7 +87,7 @@ func (e *Event) UnmarshalPayload(v interface{}) error {
 
 	if payload, ok := e.payload.(json.RawMessage); ok {
 		if err := json.Unmarshal(payload, v); err != nil {
-			return err
+			return &ErrDeserializingEvent{e, err}
 		}
 
 		return nil
@@ -102,7 +95,7 @@ func (e *Event) UnmarshalPayload(v interface{}) error {
 
 	if payload, ok := e.payload.([]byte); ok {
 		if err := json.Unmarshal(payload, v); err != nil {
-			return err
+			return &ErrDeserializingEvent{e, err}
 		}
 
 		return nil
