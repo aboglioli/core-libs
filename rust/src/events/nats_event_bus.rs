@@ -4,7 +4,7 @@ use chrono::{DateTime, Utc};
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 
-use crate::events::{Event, EventError, Handler, Publisher, Subscriber};
+use crate::events::{Error, Event, Handler, Publisher, Subscriber};
 
 #[derive(Serialize, Deserialize)]
 struct NatsEvent {
@@ -31,7 +31,7 @@ impl NatsEventBus {
 
 #[async_trait]
 impl Publisher for NatsEventBus {
-    async fn publish(&self, events: &[Event]) -> Result<(), EventError> {
+    async fn publish(&self, events: &[Event]) -> Result<(), Error> {
         for event in events {
             let nats_event = NatsEvent {
                 id: event.id().to_string(),
@@ -41,12 +41,12 @@ impl Publisher for NatsEventBus {
                 timestamp: event.timestamp().clone(),
             };
 
-            let msg = serde_json::to_vec(&nats_event).map_err(|_| EventError::Internal)?;
+            let msg = serde_json::to_vec(&nats_event).map_err(Error::SerializingEvent)?;
 
             self.client
                 .publish(event.topic().to_string(), msg.into())
                 .await
-                .map_err(|_| EventError::Internal)?;
+                .map_err(|err| Error::PublishingEvent(Box::new(err)))?;
         }
 
         Ok(())
@@ -55,17 +55,20 @@ impl Publisher for NatsEventBus {
 
 #[async_trait]
 impl Subscriber for NatsEventBus {
-    async fn subscribe(&self, subject: &str, handler: Box<dyn Handler>) -> Result<(), EventError> {
+    async fn subscribe(&self, subject: &str, handler: Box<dyn Handler>) -> Result<(), Error> {
         let mut sub = self
             .client
             .queue_subscribe(subject.to_string(), self.consumer_group.to_string())
             .await
-            .map_err(|_| EventError::Internal)?;
+            .map_err(|err| Error::SubscribingToSubject {
+                subject: subject.to_string(),
+                err,
+            })?;
 
         tokio::spawn(async move {
             while let Some(msg) = sub.next().await {
                 let nats_event: NatsEvent = serde_json::from_slice(&msg.payload)
-                    .map_err(|_| EventError::Internal)
+                    .map_err(Error::DeserializingEvent)
                     .unwrap();
 
                 let event = Event::new(

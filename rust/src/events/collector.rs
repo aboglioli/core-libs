@@ -1,7 +1,7 @@
 use serde::Serialize;
 use std::mem;
 
-use crate::events::{Event, EventError};
+use crate::events::{Error, Event};
 
 pub trait Publishable: Serialize {
     fn entity_id(&self) -> &str;
@@ -22,7 +22,7 @@ impl Collector {
         Collector::new(Vec::new())
     }
 
-    pub fn record<P>(&mut self, p: P) -> Result<(), EventError>
+    pub fn record<P>(&mut self, p: P) -> Result<(), Error>
     where
         P: Publishable,
     {

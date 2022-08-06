@@ -6,7 +6,7 @@ license = "MIT"
 edition = "2021"
 
 [dependencies]
-async-nats = "0.14"
+async-nats = "0.17"
 async-trait = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
 futures = "0.3"

@@ -1,17 +1,8 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use thiserror::Error;
 use uuid::Uuid;
 
-#[derive(Error, Debug)]
-pub enum EventError {
-    #[error("invalid event")]
-    Invalid,
-    #[error("payload serialization")]
-    PayloadSerialization,
-    #[error("internal event error")]
-    Internal,
-}
+use crate::events::Error;
 
 // Event
 #[derive(Debug, Clone, PartialEq)]
@@ -30,21 +21,21 @@ impl Event {
         topic: String,
         payload: Vec<u8>,
         timestamp: DateTime<Utc>,
-    ) -> Result<Event, EventError> {
+    ) -> Result<Event, Error> {
         if id.is_empty() {
-            return Err(EventError::Invalid);
+            return Err(Error::InvalidEvent);
         }
 
         if entity_id.is_empty() {
-            return Err(EventError::Invalid);
+            return Err(Error::InvalidEvent);
         }
 
         if topic.is_empty() {
-            return Err(EventError::Invalid);
+            return Err(Error::InvalidEvent);
         }
 
         if payload.is_empty() {
-            return Err(EventError::Invalid);
+            return Err(Error::InvalidEvent);
         }
 
         Ok(Event {
@@ -56,7 +47,7 @@ impl Event {
         })
     }
 
-    pub fn create<I, T, P>(entity_id: I, topic: T, payload: &P) -> Result<Event, EventError>
+    pub fn create<I, T, P>(entity_id: I, topic: T, payload: &P) -> Result<Event, Error>
     where
         I: Into<String>,
         T: Into<String>,
@@ -65,7 +56,7 @@ impl Event {
         let entity_id = entity_id.into();
         let topic = topic.into();
 
-        let payload = serde_json::to_vec(payload).map_err(|_| EventError::PayloadSerialization)?;
+        let payload = serde_json::to_vec(payload).map_err(Error::SerializingPayload)?;
 
         Event::new(
             Uuid::new_v4().to_string(),
@@ -92,11 +83,11 @@ impl Event {
         &self.payload
     }
 
-    pub fn deserialize_payload<'a, T>(&'a self) -> Result<T, EventError>
+    pub fn deserialize_payload<'a, T>(&'a self) -> Result<T, Error>
     where
         T: Deserialize<'a>,
     {
-        serde_json::from_slice(&self.payload).map_err(|_| EventError::PayloadSerialization)
+        serde_json::from_slice(&self.payload).map_err(Error::DeserializingPayload)
     }
 
     pub fn timestamp(&self) -> &DateTime<Utc> {

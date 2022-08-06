@@ -1,10 +1,4 @@
-use thiserror::Error;
-
-#[derive(Error, Debug)]
-pub enum VersionError {
-    #[error("invalid version")]
-    Invalid,
-}
+use crate::models::Error;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Version {
@@ -13,9 +7,9 @@ pub struct Version {
 }
 
 impl Version {
-    pub fn new(version: i64) -> Result<Version, VersionError> {
+    pub fn new(version: i64) -> Result<Version, Error> {
         if version < 1 {
-            return Err(VersionError::Invalid);
+            return Err(Error::InvalidVersion(version));
         }
 
         Ok(Version {

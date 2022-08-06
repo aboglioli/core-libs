@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
-use crate::events::{Event, EventError, Handler, Publisher, Subscriber};
+use crate::events::{Error, Event, Handler, Publisher, Subscriber};
 
 struct Subscription {
     subject: String,
@@ -43,7 +43,7 @@ fn subject_has_topic(subject: &str, topic: &str) -> bool {
 
 #[async_trait]
 impl Publisher for LocalEventBus {
-    async fn publish(&self, events: &[Event]) -> Result<(), EventError> {
+    async fn publish(&self, events: &[Event]) -> Result<(), Error> {
         let subscriptions = self.subscriptions.read().await;
 
         for event in events {
@@ -60,7 +60,7 @@ impl Publisher for LocalEventBus {
 
 #[async_trait]
 impl Subscriber for LocalEventBus {
-    async fn subscribe(&self, subject: &str, handler: Box<dyn Handler>) -> Result<(), EventError> {
+    async fn subscribe(&self, subject: &str, handler: Box<dyn Handler>) -> Result<(), Error> {
         let mut subscriptions = self.subscriptions.write().await;
 
         subscriptions.push(Subscription {
@@ -94,7 +94,7 @@ mod tests {
 
     #[async_trait]
     impl Handler for Counter {
-        async fn handle(&self, event: &Event) -> Result<(), EventError> {
+        async fn handle(&self, event: &Event) -> Result<(), Error> {
             let incr: i64 = event.deserialize_payload().unwrap();
 
             let mut count = self.count.lock().await;

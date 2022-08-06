@@ -1,11 +1,6 @@
 use chrono::{DateTime, Utc};
-use thiserror::Error;
 
-#[derive(Error, Debug)]
-pub enum TimestampsError {
-    #[error("invalid timestamps")]
-    Invalid,
-}
+use crate::models::Error;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Timestamps {
@@ -19,18 +14,18 @@ impl Timestamps {
         created_at: DateTime<Utc>,
         updated_at: DateTime<Utc>,
         deleted_at: Option<DateTime<Utc>>,
-    ) -> Result<Timestamps, TimestampsError> {
+    ) -> Result<Timestamps, Error> {
         if updated_at < created_at {
-            return Err(TimestampsError::Invalid);
+            return Err(Error::InvalidTimestamps);
         }
 
         if let Some(deleted_at) = deleted_at {
             if deleted_at < created_at {
-                return Err(TimestampsError::Invalid);
+                return Err(Error::InvalidTimestamps);
             }
 
             if deleted_at < updated_at {
-                return Err(TimestampsError::Invalid);
+                return Err(Error::InvalidTimestamps);
             }
         }
 
