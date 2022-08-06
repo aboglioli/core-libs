@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-
-	"github.com/aboglioli/core-libs/go/collections"
 )
 
 // ErrorCode
@@ -30,11 +28,11 @@ type Error struct {
 	code     *ErrorCode
 	message  string
 	cause    error
-	metadata collections.Metadata
+	metadata Metadata
 }
 
-func New(code *ErrorCode, message string, metadata ...collections.Metadata) *Error {
-	m := collections.NewMetadata()
+func New(code *ErrorCode, message string, metadata ...Metadata) *Error {
+	m := NewMetadata()
 	for _, metadata := range metadata {
 		m = m.Merge(metadata)
 	}
@@ -46,7 +44,7 @@ func New(code *ErrorCode, message string, metadata ...collections.Metadata) *Err
 	}
 }
 
-func Wrap(code *ErrorCode, cause error, message string, metadata ...collections.Metadata) *Error {
+func Wrap(code *ErrorCode, cause error, message string, metadata ...Metadata) *Error {
 	err := New(code, message, metadata...)
 	err.cause = cause
 
@@ -65,7 +63,7 @@ func (err *Error) Cause() error {
 	return err.cause
 }
 
-func (err *Error) Metadata() collections.Metadata {
+func (err *Error) Metadata() Metadata {
 	return err.metadata
 }
 

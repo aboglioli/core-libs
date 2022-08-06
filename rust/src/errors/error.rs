@@ -2,7 +2,7 @@ use std::error::Error as StdError;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::result::Result as StdResult;
 
-use crate::collections::Metadata;
+use crate::errors::Metadata;
 
 // Result
 pub type Result<T> = StdResult<T, Error>;

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/aboglioli/core-libs/go/collections"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -54,7 +53,7 @@ func TestCreateError(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			m := collections.NewMetadata()
+			m := NewMetadata()
 			for k, v := range test.metadata {
 				m = m.And(k, v)
 			}

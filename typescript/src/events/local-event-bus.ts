@@ -1,4 +1,6 @@
-import { Event, Handler, Publisher, Subscriber } from '../events';
+import { Event } from './event';
+import { Publisher } from './publisher';
+import { Handler, Subscriber } from './subscriber';
 
 interface Subscription {
   subject: string;

@@ -1,4 +1,4 @@
-package collections
+package errors
 
 type Metadata struct {
 	metadata map[string]interface{}

@@ -1,4 +1,4 @@
-import { Metadata } from '../collections';
+import { Metadata } from './metadata';
 
 export class ErrorCode {
   private code: string;

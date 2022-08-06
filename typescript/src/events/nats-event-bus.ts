@@ -1,7 +1,9 @@
 import { Codec, JSONCodec, NatsConnection, Subscription as NatsSubscription } from 'nats';
 import { Buffer } from 'buffer';
 
-import { Event, Handler, Publisher, Subscriber } from '../events';
+import { Event } from './event';
+import { Publisher } from './publisher';
+import { Handler, Subscriber } from './subscriber';
 
 export interface NatsEvent {
   id: string;

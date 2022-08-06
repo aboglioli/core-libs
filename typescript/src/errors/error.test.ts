@@ -1,5 +1,5 @@
-import { Error, ErrorCode } from '../errors';
-import { Metadata } from '../collections';
+import { Error, ErrorCode } from './error';
+import { Metadata } from './metadata';
 
 describe('Error', () => {
   test('create new error', () => {
