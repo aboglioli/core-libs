@@ -87,7 +87,7 @@ func (e *Event) UnmarshalPayload(v interface{}) error {
 
 	if payload, ok := e.payload.(json.RawMessage); ok {
 		if err := json.Unmarshal(payload, v); err != nil {
-			return &ErrDeserializingEvent{e, err}
+			return &ErrDeserializingPayload{e, err}
 		}
 
 		return nil
@@ -95,7 +95,7 @@ func (e *Event) UnmarshalPayload(v interface{}) error {
 
 	if payload, ok := e.payload.([]byte); ok {
 		if err := json.Unmarshal(payload, v); err != nil {
-			return &ErrDeserializingEvent{e, err}
+			return &ErrDeserializingPayload{e, err}
 		}
 
 		return nil

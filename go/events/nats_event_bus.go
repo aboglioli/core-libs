@@ -61,8 +61,9 @@ func (eb *NatsEventBus) Subscribe(ctx context.Context, subject string, handler H
 	_, err := eb.conn.QueueSubscribe(subject, eb.consumerGroup, func(msg *nats.Msg) {
 		var natsEvent NatsEvent
 		if err := json.Unmarshal(msg.Data, &natsEvent); err != nil {
-			panic(err)
+			panic(&ErrDeserializingEvent{err})
 		}
+
 		event, err := NewEvent(
 			natsEvent.Id,
 			natsEvent.EntityId,

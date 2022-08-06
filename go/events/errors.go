@@ -17,7 +17,7 @@ type ErrSerializingEvent struct {
 }
 
 func (e *ErrSerializingEvent) Error() string {
-	return fmt.Sprintf("could not serialize event payload: %s", e.err)
+	return fmt.Sprintf("could not serialize event: %s", e.err)
 }
 
 func (e *ErrSerializingEvent) Unwrap() error {
@@ -26,15 +26,42 @@ func (e *ErrSerializingEvent) Unwrap() error {
 
 // ErrDeserializingEvent
 type ErrDeserializingEvent struct {
+	err error
+}
+
+func (e *ErrDeserializingEvent) Error() string {
+	return fmt.Sprintf("could not deserialize event: %s", e.err)
+}
+
+func (e *ErrDeserializingEvent) Unwrap() error {
+	return e.err
+}
+
+// ErrSerializingPayload
+type ErrSerializingPayload struct {
 	Event *Event
 	err   error
 }
 
-func (e *ErrDeserializingEvent) Error() string {
+func (e *ErrSerializingPayload) Error() string {
+	return fmt.Sprintf("could not serialize event payload: %s", e.err)
+}
+
+func (e *ErrSerializingPayload) Unwrap() error {
+	return e.err
+}
+
+// ErrDeserializingPâyload
+type ErrDeserializingPayload struct {
+	Event *Event
+	err   error
+}
+
+func (e *ErrDeserializingPayload) Error() string {
 	return fmt.Sprintf("could not deserialize event payload: %s", e.err)
 }
 
-func (e *ErrDeserializingEvent) Unwrap() error {
+func (e *ErrDeserializingPayload) Unwrap() error {
 	return e.err
 }
 
